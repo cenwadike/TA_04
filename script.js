@@ -7,8 +7,7 @@ const screen = document.getElementById('screen');
 function add(a, b) { return a + b; }
 function subtract(a, b) { return a - b; }
 function multiply(a, b) { return a * b; }
-function divide(a, b) { return a / b; }
-function modulo(a, b) { return a % b; }
+function divide(a, b) { return b === 0 ? 'Error' : a / b; }
 
 // 2. Typing Numbers
 function appendValue(num) {
@@ -65,14 +64,7 @@ function calculate() {
         case '-': result = subtract(num1, num2); break;
         case '*': result = multiply(num1, num2); break;
         case '/': result = divide(num1, num2); break;
-        case '%': result = modulo(num1, num2); break;
         default: return;
-    }
-
-     // Check the result right after the switch
-    if (isError(result)) {
-        handleError();
-        return;
     }
 
     screen.value = result;
@@ -99,13 +91,23 @@ function deleteLast() {
     }
     updateDisplay();
 }
-//  Check if a result is an error
-function isError(value) {
-    return value === 'Error';
-}
- 
-//  Show error and reset the calculator
-function handleError() {
-    screen.value = 'Err';
-    clearScreen();
-}
+
+// 7. Keyboard Support (window API)
+// `document` = the page content. `window` = the browser tab itself.
+// Listening on `window` lets us react to key presses anywhere on the
+// page. It just calls the same functions the buttons already call.
+window.addEventListener('keydown', function (event) {
+    if (event.key >= '0' && event.key <= '9') {
+        appendValue(event.key);
+    } else if (event.key === '.') {
+        appendValue('.');
+    } else if (event.key === '+' || event.key === '-' || event.key === '*' || event.key === '/') {
+        setOperator(event.key);
+    } else if (event.key === 'Enter') {
+        calculate();
+    } else if (event.key === 'Backspace') {
+        deleteLast();
+    } else if (event.key === 'Escape') {
+        clearScreen();
+    }
+});
